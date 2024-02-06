@@ -8,7 +8,7 @@ import (
 	"path"
 	"strconv"
 
-	"github.com/Nikitalapshin95/Myproject.git/clients/telegram/lib/e"
+	"github.com/Nikitalapshin95/Myproject.git/lib/e"
 )
 
 type Client struct {
@@ -22,16 +22,12 @@ const (
 	sendMessageMethod = "sendMessage"
 )
 
-func New(host string, token string) Client {
-	return Client{
+func New(host string, token string) *Client {
+	return &Client{
 		host:     host,
-		basePath: newBasePath(token),
+		basePath: "bot" + token,
 		client:   http.Client{},
 	}
-}
-
-func newBasePath(token string) string {
-	return "bot" + token
 }
 
 func (c *Client) Updates(offset int, limit int) (updates []Update, err error) {
