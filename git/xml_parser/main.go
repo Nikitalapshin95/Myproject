@@ -10,6 +10,8 @@ import (
 	"github.com/antchfx/xmlquery"
 )
 
+
+// Структура Item JSON можно добавить еще поля, структура соответствует атрибутам XML
 type Item struct {
 	Title           string `json:"title"`
 	Description     string `json:"description"`
@@ -23,6 +25,7 @@ type Item struct {
 }
 
 func main() {
+	// Здесь URL берем из консоли в процессе можно изменить
 	var link string
 	fmt.Scan(&link)
 
@@ -31,6 +34,7 @@ func main() {
 		log.Fatalf("Error parsing XML: %q", err)
 	}
 
+	// Создаем map для хранения данных для JSON
 	result := make(map[string]interface{})
 	channelNode := xmlquery.FindOne(doc, "//channel")
 	result["title"] = channelNode.SelectElement("title").InnerText()
@@ -38,6 +42,7 @@ func main() {
 	result["image"] = "" // Здесь нужно вставить URL изображения, если есть
 	result["url"] = channelNode.SelectElement("link").InnerText()
 
+	// Тут наполняем уже структуру Item, обработку доп.полей в процессе дописать
 	items := make([]Item, 0)
 	itemNodes := xmlquery.Find(doc, "//item")
 	for _, itemNode := range itemNodes {
@@ -49,17 +54,21 @@ func main() {
 		// Здесь можно добавить обработку других полей, если они присутствуют в XML
 		items = append(items, item)
 	}
+
 	result["items"] = items
 
+	// Преобразовывем result в JSON
 	jsonResult, err := json.MarshalIndent(result, "", "    ")
 	if err != nil {
 		log.Fatalf("Error marshalling JSON: %q", err)
 	}
 
+	// Здесь данные мы записываем в файл, в процессе изменить, тут это для проверки.
 	file, err := os.Create("output.json")
 	if err != nil {
 		log.Fatalf("Ошибка при открытии файла: %q", err)
 	}
+	
 	defer file.Close()
 
 	// Запись JSON данных в файл
